@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 import Link from "next/link";
 
@@ -39,6 +40,7 @@ export default function RootLayout({
         <footer className="footer">
           made with &lt;3 & ⋆˙⟡
         </footer>
+        <Analytics />
       </body>
     </html>
   );
