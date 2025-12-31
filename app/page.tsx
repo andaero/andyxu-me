@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className="split-container">
       <div className="content-side">
-        <div className="container" style={{ margin: "120px auto 80px", maxWidth: "540px" }}>
+        <div className="container home-container">
           <h1>hi! i&apos;m andy</h1>
           
           <p>
