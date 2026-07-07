@@ -112,12 +112,6 @@ export default function CrystalExplorer() {
                   ))}
             </div>
           </div>
-
-          <span className="ce-lines-chip">
-            {mode === "wyckoff"
-              ? `${c.sites.length} sites → ${c.natoms} atoms`
-              : `${c.natoms} atoms, 1 line each`}
-          </span>
         </div>
       </div>
 

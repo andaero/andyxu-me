@@ -8,22 +8,36 @@ const DATA = [
   { label: "FlowMM", value: 2.8, highlight: false },
 ];
 
-const MAX = 8;
+const MAX = 10;
+const TICKS = [0, 2, 4, 6, 8, 10];
 
 export default function ResultsBars() {
   return (
     <div className="rb">
       <div className="fig-title">Unconditional Crystal Generation S.U.N. Rate</div>
-      {DATA.map((d, i) => (
-        <div key={d.label} className={`rb-row${d.highlight ? " hl" : ""}`}>
-          <span className="rb-rank">{i + 1}</span>
-          <span className="rb-label">{d.label}</span>
-          <div className="rb-track">
-            <div className="rb-bar" style={{ width: `${(d.value / MAX) * 100}%` }} />
+      <div className="rb-rows">
+        {DATA.map((d, i) => (
+          <div key={d.label} className={`rb-row${d.highlight ? " hl" : ""}`}>
+            <span className="rb-rank">{i + 1}</span>
+            <span className="rb-label">{d.label}</span>
+            <div className="rb-track">
+              <div className="rb-bar" style={{ width: `${(d.value / MAX) * 100}%` }} />
+              <span className="rb-val">{d.value}%</span>
+            </div>
           </div>
-          <span className="rb-val">{d.value.toFixed(1).replace(/\.0$/, "")}%</span>
+        ))}
+      </div>
+      <div className="rb-row rb-axis-row" aria-hidden="true">
+        <span />
+        <span />
+        <div className="rb-axis">
+          {TICKS.map((t) => (
+            <span key={t} className="rb-tick" style={{ left: `${(t / MAX) * 100}%` }}>
+              {t === 10 ? "10%" : t}
+            </span>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 }

@@ -20,18 +20,16 @@ for multi-objective property-guided crystal generation, to solve this problem.
 ## The setup
 
 We start from **Qwen-2.5 7B** and fine-tune it with LoRA on
-[MP-20](https://github.com/txie-93/cdvae), 45,231 inorganic crystals from the
+[MP-20](https://github.com/txie-93/cdvae), ~45k inorganic crystals from the
 Materials Project. To guide our search space towards chemically useful structures,
 we propose **RLIP** (Reinforcement Learning from Interatomic Potentials). The reward comes
-from EquiformerV2, a machine-learned interatomic potential that predicts a structure's
-relaxed energy, allowing us to rank candidates by thermodynamic stability and run iterative
+from EquiformerV2, a machine-learned interatomic potential that predicts a structure's energy,
+a (rough) proxy for real world synthesizability, allowing us to rank candidates by thermodynamic stability and run iterative
 [DPO](https://arxiv.org/abs/2305.18290) on preference pairs.
 
 Our primary metric is the **S.U.N. rate**: the percentage of generated
-crystals that are simultaneously <Term def={<>The structure's relaxed energy sits on or below the convex hull of known competing phases (E<sub>hull</sub> ≤ 0 eV/atom).</>}>**stable**</Term>, <Term def="Measured within a batch of generations: how many of the model's own samples are distinct from each other.">**unique**</Term>, and <Term def="Measured against the reference set of known materials: whether a structure already exists in the training data.">**novel**</Term>. We evaluate across three
-settings — unconditional generation, space-group-conditioned generation
-(scored by **S.S.U.N.**, which additionally requires the generated structure
-to satisfy the requested symmetry), and high bulk modulus-conditioned generation (which requires the structure to have hardness &geq; 325 GPa).
+crystals that are simultaneously <Term def={<>The structure's relaxed energy sits on or below the convex hull of known competing phases (E<sub>hull</sub> ≤ 0 eV/atom).</>}>**stable**</Term>, <Term def="How many of the model's own samples are distinct from each other.">**unique**</Term>, and <Term def="Whether a structure already exists in the training data of known materials.">**novel**</Term>. We evaluate across three
+settings — unconditional generation, <Term def={<>Scored by <strong>S.S.U.N.</strong>, which additionally requires the generated structure to satisfy the requested symmetry.</>}>**space-group-conditioned generation**</Term>, and <Term def={<>Requires the structure to have hardness ≥ 325 GPa.</>}>**high bulk modulus-conditioned generation**</Term>.
 
 ## Mode Collapse
 

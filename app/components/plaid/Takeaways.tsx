@@ -47,7 +47,7 @@ const CARDS = [
     text: (
       <>
         Motivated by <b>mode collapse</b> on a naïve 3D representation, we develop a
-        symmetry-informed encoding to scale RLIP
+        symmetry-informed encoding to scale reinforcement learning
       </>
     ),
   },

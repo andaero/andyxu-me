@@ -793,17 +793,6 @@ a {
   border-bottom-color: #8b5fd6;
 }
 
-.ce-lines-chip {
-  position: absolute;
-  bottom: 10px;
-  right: 12px;
-  z-index: 2;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 10.5px;
-  color: var(--primary-light);
-  white-space: nowrap;
-}
-
 .ce-boxwrap {
   flex: 1;
   min-height: 0;
@@ -814,7 +803,7 @@ a {
 .ce-box {
   flex: 1;
   border-radius: 10px;
-  padding: 16px 18px 30px;
+  padding: 16px 18px;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 12.5px;
   line-height: 1.8;
@@ -894,18 +883,24 @@ a {
 
 .rb {
   padding: 6px 0 2px;
+  --rb-grid: rgba(54, 44, 78, 0.07);
 }
 
 .rb-row {
   display: grid;
-  grid-template-columns: 18px 92px 1fr 52px;
+  grid-template-columns: 18px 92px 1fr;
   gap: 14px;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  transition: opacity 0.18s ease-in-out;
 }
 
-.rb-row:last-child {
-  margin-bottom: 0;
+.rb-rows:hover .rb-row {
+  opacity: 0.45;
+}
+
+.rb-rows .rb-row:hover {
+  opacity: 1;
 }
 
 .rb-rank {
@@ -928,15 +923,26 @@ a {
 }
 
 .rb-track {
-  height: 12px;
-  border-radius: 6px;
-  background: rgba(54, 44, 78, 0.08);
-  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 24px;
+  border-left: 1px solid rgba(54, 44, 78, 0.25);
+  background-image: linear-gradient(var(--rb-grid), var(--rb-grid)),
+    linear-gradient(var(--rb-grid), var(--rb-grid)),
+    linear-gradient(var(--rb-grid), var(--rb-grid)),
+    linear-gradient(var(--rb-grid), var(--rb-grid)),
+    linear-gradient(var(--rb-grid), var(--rb-grid));
+  background-repeat: no-repeat;
+  background-size: 1px 100%;
+  background-position: 20% 0, 40% 0, 60% 0, 80% 0, 100% 0;
 }
 
 .rb-bar {
-  height: 100%;
-  border-radius: 6px;
+  flex-shrink: 0;
+  height: 10px;
+  border-radius: 0 4px 4px 0;
   background: #d6d3dd;
   animation: rb-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -953,11 +959,10 @@ a {
 
 .rb-val {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--primary-light);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  text-align: right;
   animation: rb-fade 1.2s ease;
 }
 
@@ -975,9 +980,28 @@ a {
   font-weight: 600;
 }
 
+.rb-row.rb-axis-row {
+  margin: 2px 0 0;
+}
+
+.rb-axis {
+  position: relative;
+  height: 15px;
+}
+
+.rb-tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  color: #a39cb3;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 768px) {
   .rb-row {
-    grid-template-columns: 14px 72px 1fr 46px;
+    grid-template-columns: 14px 72px 1fr;
     gap: 10px;
   }
   .rb-label {
