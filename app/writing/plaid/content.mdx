@@ -17,7 +17,7 @@ for multi-objective property-guided crystal generation, to solve this problem.
 
 <Takeaways />
 
-## The setup
+## The Setup
 
 We start from **Qwen-2.5 7B** and fine-tune it with LoRA on
 [MP-20](https://github.com/txie-93/cdvae), ~45k inorganic crystals from the
@@ -29,13 +29,15 @@ a (rough) proxy for real world synthesizability, allowing us to rank candidates 
 
 Our primary metric is the **S.U.N. rate**: the percentage of generated
 crystals that are simultaneously <Term def={<>The structure's relaxed energy sits on or below the convex hull of known competing phases (E<sub>hull</sub> ≤ 0 eV/atom).</>}>**stable**</Term>, <Term def="How many of the model's own samples are distinct from each other.">**unique**</Term>, and <Term def="Whether a structure already exists in the training data of known materials.">**novel**</Term>. We evaluate across three
-settings — unconditional generation, <Term def={<>Scored by <strong>S.S.U.N.</strong>, which additionally requires the generated structure to satisfy the requested symmetry.</>}>**space-group-conditioned generation**</Term>, and <Term def={<>Requires the structure to have hardness ≥ 325 GPa.</>}>**high bulk modulus-conditioned generation**</Term>.
+settings — unconditional generation, space-group-conditioned generation
+(scored by **S.S.U.N.**, which additionally requires the generated structure
+to satisfy the requested symmetry), and high bulk modulus-conditioned generation (which requires the structure to have hardness &geq; 325 GPa).
 
 ## Mode Collapse
 
-The obvious first attempt is to write each crystal the way most prior LLM
-work like [CrystalLLM](https://proceedings.iclr.cc/paper_files/paper/2024/file/5dc6d1c81754c32008c9667339b3fdd3-Paper-Conference.pdf) does, where they list 3D fractional coordinates one line per atom, and run RLIP on that. However, doing this leads stability keeps climbing across
-DPO iterations while novelty falls drastically. The model games the reward by memorizing
+The obvious first attempt is to RL the LLM using a standard 3D coordinate representation like [prior work](https://proceedings.iclr.cc/paper_files/paper/2024/file/5dc6d1c81754c32008c9667339b3fdd3-Paper-Conference.pdf), where
+each fractional coordinate exists on a seperate line per atom. However, interestingly, doing this leads novelty to fall drastically while stability keeps climbing across
+multiple iterations. The model **games the reward** by memorizing
 a few stable structures and emitting them over and over. 
 
 <figure className="figure">
@@ -48,8 +50,8 @@ a few stable structures and emitting them over and over.
 ## Wyckoff Representation
 
 Crystal structures inherently follow symmetry constraints that can be represented by space groups and Wyckoff positions.
-Symmetry is important as it is directly correlated with downstream properties like piezoelectricity. We encode each crystal as a
-compact, symmetry-informed <span className="wyk">Wyckoff</span> text
+A crystals symmetry is directly correlated with downstream properties like piezoelectricity. We encode each crystal as a
+compact, <span className="wyk">Wyckoff</span> text
 representation, which vastly improves performance under RLIP. We hypothesize that our Wyckoff representation works because of its higher information density, where local atom
 type or coordinate changes propagate to globally meaningful structure differences, expanding the diversity of valid
 structures the model can learn and generate. Below are a few structures you can click through to directly compare how our
@@ -62,7 +64,7 @@ Wyckoff representation compares to prior 3D coordinate methods.
 </figure>
 
 
-## Temperature as an entropy regularizer
+## Temperature as an Entropy Regularizer
 
 
 <figure className="figure">
