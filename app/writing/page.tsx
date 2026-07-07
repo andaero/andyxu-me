@@ -3,9 +3,9 @@ import Link from "next/link";
 const posts = [
   {
     slug: "plaid",
-    title: "PLaID++: teaching a language model to invent stable crystals",
-    desc: "Post-training an LLM for diverse, stable, novel crystal generation — via a symmetry-informed Wyckoff representation and temperature as an entropy regularizer.",
-    date: "2026",
+    title: "PLaID++: A Preference-Aligned Language Model for Targeted Inorganic Materials Design",
+    desc: "How do we design post-training methods that scale for discovering novel crystals?",
+    date: "07-07-2026",
   },
 ];
 
