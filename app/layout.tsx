@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 import Link from "next/link";
@@ -7,6 +8,12 @@ import Link from "next/link";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+const junicode = localFont({
+  src: "./fonts/JunicodeVF-Roman.woff2",
+  variable: "--font-junicode",
+  weight: "300 700",
 });
 
 const geistMono = Geist_Mono({
@@ -27,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${inter.variable} ${geistMono.variable} ${junicode.variable} antialiased min-h-screen flex flex-col`}
       >
         <nav className="nav">
           <Link href="/">home</Link>

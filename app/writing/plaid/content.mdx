@@ -1,0 +1,148 @@
+import TemperatureExplorer from "../../components/plaid/TemperatureExplorer";
+import CrystalExplorer from "../../components/plaid/CrystalExplorer";
+import ModeCollapse from "../../components/plaid/ModeCollapse";
+import ResultsBars from "../../components/plaid/ResultsBars";
+import TrainingCurves from "../../components/plaid/TrainingCurves";
+import Takeaways from "../../components/plaid/Takeaways";
+import Term from "../../components/plaid/Term";
+import SpaceGroupBars from "../../components/plaid/SpaceGroupBars";
+
+Reinforcement Learning from Verifiable Rewards (RLVR) has been able to
+improve correctness in LLMs for domains like math and coding. But for many scientific problems, like materials science, there is no single "correct" result. You
+want **many** candidates that are all thermodynamically stable, distinct
+from each other, and outside our current knowledge of crystal space.
+
+We built PLaID++, an LLM post-trained
+for multi-objective property-guided crystal generation, to solve this problem.
+
+<Takeaways />
+
+## The setup
+
+We start from **Qwen-2.5 7B** and fine-tune it with LoRA on
+[MP-20](https://github.com/txie-93/cdvae), 45,231 inorganic crystals from the
+Materials Project. To guide our search space towards chemically useful structures,
+we propose **RLIP** (Reinforcement Learning from Interatomic Potentials). The reward comes
+from EquiformerV2, a machine-learned interatomic potential that predicts a structure's
+relaxed energy, allowing us to rank candidates by thermodynamic stability and run iterative
+[DPO](https://arxiv.org/abs/2305.18290) on preference pairs.
+
+Our primary metric is the **S.U.N. rate**: the percentage of generated
+crystals that are simultaneously <Term def={<>The structure's relaxed energy sits on or below the convex hull of known competing phases (E<sub>hull</sub> ≤ 0 eV/atom).</>}>**stable**</Term>, <Term def="Measured within a batch of generations: how many of the model's own samples are distinct from each other.">**unique**</Term>, and <Term def="Measured against the reference set of known materials: whether a structure already exists in the training data.">**novel**</Term>. We evaluate across three
+settings — unconditional generation, space-group-conditioned generation
+(scored by **S.S.U.N.**, which additionally requires the generated structure
+to satisfy the requested symmetry), and high bulk modulus-conditioned generation (which requires the structure to have hardness &geq; 325 GPa).
+
+## Mode Collapse
+
+The obvious first attempt is to write each crystal the way most prior LLM
+work like [CrystalLLM](https://proceedings.iclr.cc/paper_files/paper/2024/file/5dc6d1c81754c32008c9667339b3fdd3-Paper-Conference.pdf) does, where they list 3D fractional coordinates one line per atom, and run RLIP on that. However, doing this leads stability keeps climbing across
+DPO iterations while novelty falls drastically. The model games the reward by memorizing
+a few stable structures and emitting them over and over. 
+
+<figure className="figure">
+  <div className="figure-frame">
+    <ModeCollapse />
+  </div>
+</figure>
+
+
+## Wyckoff Representation
+
+Crystal structures inherently follow symmetry constraints that can be represented by space groups and Wyckoff positions.
+Symmetry is important as it is directly correlated with downstream properties like piezoelectricity. We encode each crystal as a
+compact, symmetry-informed <span className="wyk">Wyckoff</span> text
+representation, which vastly improves performance under RLIP. We hypothesize that our Wyckoff representation works because of its higher information density, where local atom
+type or coordinate changes propagate to globally meaningful structure differences, expanding the diversity of valid
+structures the model can learn and generate. Below are a few structures you can click through to directly compare how our
+Wyckoff representation compares to prior 3D coordinate methods.
+
+<figure className="figure">
+  <div className="figure-frame">
+    <CrystalExplorer />
+  </div>
+</figure>
+
+
+## Temperature as an entropy regularizer
+
+
+<figure className="figure">
+  <div className="figure-frame">
+    <TrainingCurves variant="temperature" />
+  </div>
+</figure>
+
+Representation determines *what* the model can express; sampling determines
+*how much* of that space it explores. The most consequential sampling
+parameter for crystal diversity is **temperature**. In the context of materials discovery,
+we find increasing temperature across successive iterations of RLIP is critical to
+maintains exploration of novel chemical space and avoid overoptimization of stability.
+
+
+
+<figure className="figure">
+  <div className="figure-frame">
+    <TemperatureExplorer />
+  </div>
+</figure>
+
+## SOTA Results
+
+Combining the Wyckoff representation, RLIP, and the dynamic temperature
+schedule, PLaID++ reaches a **22.3% stability rate** and a **7.74% S.U.N.
+rate** on unconditional MP-20 generation — roughly **50% higher S.U.N. than
+the best prior method** — without any specialized equivariant architecture:
+
+<figure className="figure">
+  <div className="figure-frame">
+    <ResultsBars />
+  </div>
+</figure>
+
+## Cross Task Transfer
+
+ Running DPO on space-group-conditioned pairs alone lifts conditional S.S.U.N. by 22% over
+the base Wyckoff model. Mixing in preference pairs from *unconditional*
+generation — a different task — more than doubles that improvement.
+The gains are most pronounced exactly where conditional training data is
+scarce 
+
+
+<figure className="figure">
+  <div className="figure-frame">
+    <TrainingCurves variant="joint" />
+  </div>
+</figure>
+
+<figure className="figure">
+  <div className="figure-frame">
+    <SpaceGroupBars variant="joint" />
+  </div>
+</figure>
+
+**The improvements hold out of distribution.** We held eight space groups out
+of the RLIP reward entirely, then prompted the model to generate structures
+for them. PLaID++ outperforms fine-tuning alone by an average of 20%
+S.S.U.N. on these held-out groups. This suggests the model learns structural principles that
+apply across symmetry groups rather than memorizing the reward distribution.
+
+<figure className="figure">
+  <div className="figure-frame">
+    <SpaceGroupBars variant="heldout" />
+  </div>
+</figure>
+
+
+## Closing Thoughts
+
+Over the past few months, I've seen a surge in interest towards applications of AI for materials from the broader AI research community.
+This is incredibly exciting, and I believe that many of the results r.e. better representations and cross-task transfer are promising signals for
+the viability of foundational agents/models in this domain.
+
+The full details, ablations, and benchmarks are in the
+[paper](https://arxiv.org/pdf/2509.07150), the code is on
+[GitHub](https://github.com/andaero/PLaID), and the weights are on
+[HuggingFace](https://huggingface.co/HOPE-Lab-HMC/PLaID/tree/main/train_dpo).
+
+Feel free to reach out if you found this work interesting :)
